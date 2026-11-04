@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tesla OAuth 回调页</title>
+<style>
+  body { font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; margin: 24px; line-height: 1.6; color: #1a1a1a; }
+  h1 { font-size: 20px; }
+  .box { background: #f5f5f7; border: 1px solid #ddd; border-radius: 8px; padding: 12px; word-break: break-all; font-family: monospace; font-size: 13px; }
+  button { font-size: 16px; padding: 10px 18px; border-radius: 8px; border: 0; background: #16a34a; color: #fff; margin: 12px 0; }
+  .warn { color: #b45309; }
+  .err { color: #dc2626; }
+  .ok { color: #16a34a; }
+</style>
+</head>
+<body>
+<h1>Tesla 授权回调</h1>
+<div id="app">正在读取授权结果…</div>
+<script>
+  var q = new URLSearchParams(location.search);
+  var app = document.getElementById('app');
+  function esc(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
+  if (q.get('error')) {
+    app.innerHTML = '<p class="err">授权没有成功：' + esc(q.get('error')) +
+      (q.get('error_description') ? '（' + esc(q.get('error_description')) + '）' : '') +
+      '</p><p>把这个页面截图发给 Muse，不要重试。</p>';
+  } else if (q.get('code')) {
+    var url = location.href;
+    app.innerHTML = '<p class="ok">授权成功。</p>' +
+      '<p>下面是完整的回调链接，里面的一次性授权码<b>几分钟内过期</b>。点按钮复制，<b>立刻</b>发给 Muse 换取 token。</p>' +
+      '<button id="cp">复制完整回调链接</button>' +
+      '<div class="box">' + esc(url) + '</div>' +
+      '<p class="warn">注意：这个链接不要发到任何群聊、仓库或公开地方，发给 Muse 后不要再点开它。</p>';
+    document.getElementById('cp').onclick = function () {
+      navigator.clipboard.writeText(url).then(function () {
+        document.getElementById('cp').textContent = '已复制，去发给 Muse';
+      });
+    };
+  } else {
+    app.innerHTML = '<p>这个页面是特斯拉授权的回调页，没有授权参数时什么都不做。</p>';
+  }
+</script>
+</body>
+</html>
